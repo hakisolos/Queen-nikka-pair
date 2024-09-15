@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pair Code</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #2c3e50, #3498db);
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .box {
+      width: 320px;
+      padding: 20px;
+      background: #2b2b2b;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      color: white;
+    }
+
+    h3 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: #ecf0f1;
+    }
+
+    h6 {
+      font-size: 14px;
+      color: #bdc3c7;
+      margin-bottom: 20px;
+    }
+
+    .input-container {
+      display: flex;
+      justify-content: space-between;
+      background: #3c3c3c;
+      border-radius: 10px;
+      padding: 0.3rem;
+      width: 100%;
+    }
+
+    .input-container input {
+      border: none;
+      background: #eaeaea;
+      color: #333;
+      padding: 10px;
+      border-radius: 8px 0 0 8px;
+      width: 80%;
+      font-size: 16px;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .input-container input:focus {
+      outline: none;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .input-container button {
+      border: none;
+      background: #3498db;
+      color: white;
+      padding: 10px 15px;
+      font-size: 16px;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .input-container button:hover {
+      background: #2980b9;
+    }
+
+    #waiting-message {
+      display: none;
+      color: #e74c3c;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 500px) {
+      .box {
+        width: 90%;
+      }
+
+      .input-container {
+        flex-direction: column;
+      }
+
+      .input-container input, .input-container button {
+        width: 100%;
+        border-radius: 8px;
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="box">
+      <i class="fa fa-user fa-3x"></i>
+      <h3>Link with Phone Number</h3>
+      <h6>Enter your number with a country code.</h6>
+      <div class="input-container">
+        <input type="number" id="number" placeholder="e.g. 2349112171078">
+        <button id="submit">connect</button>
+      </div>
+      <p id="waiting-message">Please wait a while...</p>
+      <main id="pair"></main>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
+  <script>
+    let submitButton = document.getElementById("submit");
+    let numberInput = document.getElementById("number");
+    let pairElement = document.getElementById("pair");
+    let waitingMessage = document.getElementById("waiting-message");
+
+    submitButton.addEventListener("click", async (e) => {
+      e.preventDefault();
+      let phoneNumber = numberInput.value.trim();
+      if (!phoneNumber || phoneNumber.length < 10) {
+        pairElement.innerHTML = '<p style="color:red;">Invalid phone number.</p>';
+        return;
+      }
+      waitingMessage.style.display = "block";
+      try {
+        let { data } = await axios(`/code?number=${phoneNumber}`);
+        let code = data.code || "Service Unavailable";
+        pairElement.innerHTML = `<p style="color:green;">CODE: <strong>${code}</strong></p>`;
+      } catch (error) {
+        pairElement.innerHTML = '<p style="color:red;">Error fetching code.</p>';
+      } finally {
+        waitingMessage.style.display = "none";
+      }
+    });
+  </script>
+
+</body>
+</html>
